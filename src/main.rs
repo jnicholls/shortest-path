@@ -1,5 +1,6 @@
 use std::collections::{BTreeSet, VecDeque};
 use std::rc::Rc;
+use std::str::SplitWhitespace;
 
 use once_cell::sync::Lazy;
 use snafu::ensure;
@@ -74,17 +75,12 @@ where
 }
 
 fn load_dictionary(word_len: usize) -> BTreeSet<&'static str> {
-    static DICTIONARY: Lazy<Vec<String>> = Lazy::new(|| {
-        include_str!("english3.txt")
-            .split_whitespace()
-            .map(ToString::to_string)
-            .collect()
-    });
+    static DICTIONARY: Lazy<SplitWhitespace<'static>> =
+        Lazy::new(|| include_str!("english3.txt").split_whitespace());
 
     DICTIONARY
-        .iter()
+        .clone()
         .filter(|line| line.len() == word_len)
-        .map(AsRef::as_ref)
         .collect()
 }
 
